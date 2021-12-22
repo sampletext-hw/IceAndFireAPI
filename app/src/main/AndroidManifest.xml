@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.IceAndFireAPI">
         <activity
-            android:name="ru.rut.ice.and.fire.api.MainActivity"
+            android:name="ice_and_fire_api.api.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

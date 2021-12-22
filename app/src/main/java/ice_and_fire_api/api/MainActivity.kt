@@ -10,15 +10,14 @@ import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import ice_and_fire_api.api.common.Common
+import ice_and_fire_api.api.inter.RetrofitService
+import ice_and_fire_api.api.model.Hero
+import ice_and_fire_api.api.util.requestPermissionCompat
+import ice_and_fire_api.api.util.showSnackbar
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import `ice-and-fire-api`.api.common.Common
-import `ice-and-fire-api`.api.inter.RetrofitService
-import `ice-and-fire-api`.api.model.Hero
-import `ice-and-fire-api`.api.util.requestPermissionCompat
-import `ice-and-fire-api`.api.util.showSnackbar
-import ice_and_fire_api.api.HeroAdapter
 import ru.rut.api.R
 
 const val PERMISSION_REQUEST = 1
@@ -28,8 +27,9 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
     private lateinit var layout: View
     private lateinit var heroRetrofitService: RetrofitService
     lateinit var heroAdapter: HeroAdapter
-    lateinit var layouManager: LinearLayoutManager
+    lateinit var layoutManager: LinearLayoutManager
     private lateinit var heroRecyclerView: RecyclerView
+    var list = mutableListOf<Hero>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +39,11 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
 
         heroRetrofitService = Common.retrofitService
         heroRecyclerView = findViewById(R.id.content)
-        layouManager = LinearLayoutManager(this)
-        heroRecyclerView.layoutManager = layouManager
+        layoutManager = LinearLayoutManager(this)
+        heroRecyclerView.layoutManager = layoutManager
 
+        heroAdapter = HeroAdapter(baseContext, list)
+        heroRecyclerView.adapter = heroAdapter
         loadData()
 
     }
@@ -73,30 +75,33 @@ class MainActivity : AppCompatActivity(), ActivityCompat.OnRequestPermissionsRes
         ) {
             Log.i("Permission", "Available")
             layout.showSnackbar("Available", Snackbar.LENGTH_SHORT)
-            requestData()
+            requestData(1)
         } else {
             requestInternetPermission()
         }
     }
 
-    private fun requestData() {
-        heroRetrofitService.characters(150, 13).enqueue(object : Callback<MutableList<Hero>> {
-            override fun onResponse(
-                call: Call<MutableList<Hero>>,
-                response: Response<MutableList<Hero>>
-            ) {
-                heroAdapter = HeroAdapter(baseContext, response.body() as MutableList<Hero>)
-                heroRecyclerView.adapter = heroAdapter
-                heroAdapter.notifyDataSetChanged()
-            }
+    // we require localPage of 1..3 called sequentially, so list is properly ordered
+    private fun requestData(localPage: Int) {
+        if (localPage != 4) {
+            heroRetrofitService.characters(50, 40 + localPage).enqueue(object : Callback<MutableList<Hero>> {
+                override fun onResponse(
+                    call: Call<MutableList<Hero>>,
+                    response: Response<MutableList<Hero>>
+                ) {
+                    list.addAll(response.body()!!)
+                    heroAdapter.notifyDataSetChanged()
+                    requestData(localPage + 1);
+                    Log.e("Loading", localPage.toString())
+                }
 
-            override fun onFailure(call: Call<MutableList<Hero>>, t: Throwable) {
-                t.printStackTrace()
-                Log.e("NETWORK", "Failed to download data")
+                override fun onFailure(call: Call<MutableList<Hero>>, t: Throwable) {
+                    t.printStackTrace()
+                    Log.e("NETWORK", "Failed to download data")
+                }
             }
+            )
         }
-        )
-
     }
 
     private fun requestInternetPermission() {

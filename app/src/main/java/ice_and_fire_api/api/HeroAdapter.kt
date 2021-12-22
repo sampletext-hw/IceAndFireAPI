@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ru.rut.api.R
-import `ice-and-fire-api`.api.model.Hero
+import ice_and_fire_api.api.model.Hero
 
 class HeroAdapter(private val baseContext: Context, private val heroList: MutableList<Hero>): RecyclerView.Adapter<HeroAdapter.HeroHolder>() {
     class HeroHolder(itemView: View): RecyclerView.ViewHolder(itemView)  {
