@@ -1,4 +1,4 @@
-package ru.rut.permissiondemo.util
+package ice_and_fire_api.api.util
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat

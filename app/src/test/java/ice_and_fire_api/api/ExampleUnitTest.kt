@@ -1,4 +1,4 @@
-package ru.rut.permissiondemo
+package ice_and_fire_api.api
 
 import org.junit.Test
 

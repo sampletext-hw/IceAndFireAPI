@@ -1,4 +1,4 @@
-package ru.rut.permissiondemo
+package ice_and_fire_api.api
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
